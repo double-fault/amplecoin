@@ -30,9 +30,9 @@ class transaction:
     def gen_json(self) -> dict:
         return {
                 'tid': self.tid,
-                'signature': self.signature,
-                'payee': self.payee,
-                'beneficiary': self.beneficiary,
+                'signature': str(self.signature),
+                'payee': str(self.payee),
+                'beneficiary': str(self.beneficiary),
                 'amount': self.amount,
                 'time': self.time
         }
