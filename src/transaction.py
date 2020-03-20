@@ -43,18 +43,16 @@ class transaction:
     def sign(self, sk: bytes):
         dhash = enc.gen_hash("bulls on parade".encode())
         signature = enc.gen_sign(dhash, RSA.importKey(sk))
-        if not enc.verify_sign(dhash, RSA.importKey(self.payee), signature):
-            raise ValueError('bombtrack')
+        assert enc.verify_sign(dhash, RSA.importKey(self.payee), signature), \
+                "Invalid Private Key"
 
         self.signature = enc.gen_sign(enc.gen_hash(self.gen_hashable_data()), RSA.importKey(sk))
 
-    def validate(self) -> bool:
+    def validate(self):
         if self.payee == "13".encode():
-            if self.amount != MINE_REWARD: return False
+            assert self.amount == MINE_REWARD, "False mining reward" 
         else:
-            if self.signature == None: return False
-            if not enc.verify_sign(enc.gen_hash(self.gen_hashable_data()), 
-                    RSA.importKey(self.payee), self.signature):
-                return False
-        return True
+            assert self.signature != None, "No signature on transaction"
+            assert enc.verify_sign(enc.gen_hash(self.gen_hashable_data()),
+                    RSA.importKey(self.payee), self.signature), "Public Key does not match signature"
 
