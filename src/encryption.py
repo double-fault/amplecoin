@@ -21,9 +21,9 @@ def gen_hash(data: bytes) -> (bytes, str):
     datahash = cry.Hash.SHA256.new(data)
     return (datahash.digest(), datahash.hexdigest())
 
-def gen_sign(hash: (bytes, str), key) -> (int,):
-    return key.sign(hash[0], '')
+def gen_sign(hash: (bytes, str), key) -> int:
+    return key.sign(hash[0], '')[0]
 
-def verify_sign(hash: (bytes, str), pk, sign: (int,)) -> bool:
-    return pk.verify(hash[0], sign)
+def verify_sign(hash: (bytes, str), pk, sign: int) -> bool:
+    return pk.verify(hash[0], (sign,))
 

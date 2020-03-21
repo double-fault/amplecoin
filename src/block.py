@@ -14,38 +14,42 @@ import encryption as enc
 import json
 
 NUM_ZEROES = 4
+DEF_HASH = ("abcd".encode(), "abcd")
 
 class block:
-    def __init__(self, transactions, depth: int, prev_hash: (bytes, str), tid: int = 0): 
+    def __init__(self, transactions, depth: int, prev_hash: (bytes, str), 
+            tid: int = 0, nonce: int = -1, 
+            hash: (bytes, str) = DEF_HASH, ctime: str = '-1'): 
         self.transactions = transactions
         self.depth = depth
         self.prev_hash = prev_hash
-        self.spec_number = None
-        self.hash = enc.gen_hash("sleep now in the fire".encode())
+        self.nonce = nonce
+        self.hash = hash
         self.tid = tid
-        self.time = time.time()
+        self.time = ctime
 
     def get_hashable_data(self) -> str:
         data = [x.jsondump() for x in self.transactions] 
-        return str(self.time) + ' ' + str(self.depth) + ' ' + str(self.prev_hash[1]) + ' '.join(data)
+        return self.time + ' ' + str(self.depth) + ' ' + \
+                str(self.prev_hash[1]) + ' '.join(data)
 
     def mine(self, beneficiary: bytes) -> None:
-        self.time = time.time()
+        self.time = str(time.time())
         self.transactions.append(transaction(self.tid + len(self.transactions), 
             "13".encode(), beneficiary, MINE_REWARD))
         data = self.get_hashable_data() 
 
         while not self.hash[1].startswith('0' * NUM_ZEROES):
-            self.spec_number = rand.randint(1, 163527364)
-            tdata = data + str(self.spec_number)
+            self.nonce = rand.randint(1, 163527364)
+            tdata = data + str(self.nonce)
             self.hash = enc.gen_hash(tdata.encode())
 
     def validate(self):
-        data = self.get_hashable_data() + str(self.spec_number)
+        data = self.get_hashable_data() + str(self.nonce)
         hash = enc.gen_hash(data.encode())
         assert hash == self.hash, "Invalid block hash"
-        assert hash[1].startswith('0' * NUM_ZEROES), "Block has does not start with " + str(NUM_ZEROES)+\
-            " zeroes"
+        assert hash[1].startswith('0' * NUM_ZEROES), \
+                "Block has does not start with " + str(NUM_ZEROES)+ " zeroes"
 
         reward = 0
         for each in self.transactions:
@@ -60,7 +64,7 @@ class block:
                 'transactions': ratm,
                 'depth': self.depth,
                 'prev_hash': [str(self.prev_hash[0]), self.prev_hash[1]],
-                'spec_number': self.spec_number,
+                'nonce': self.nonce,
                 'hash': [str(self.hash[0]), self.hash[1]],
                 'tid': self.tid,
                 'time': self.time

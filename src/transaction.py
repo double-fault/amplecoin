@@ -15,22 +15,24 @@ MINE_REWARD=10
 
 class transaction:
     # payee is 13 for mining reward
-    def __init__(self, tid: int, payee: bytes, beneficiary: bytes, amount: float):
-        self.signature = None
+    def __init__(self, tid: int, payee: bytes, beneficiary: bytes, amount: float,
+            signature: int = -1, time: str = -1):
+        self.signature = signature
         self.payee = payee
         self.beneficiary = beneficiary
         self.amount = amount
-        self.time = int(time.time())
+        self.time = time
+        if self.time == -1: self.time = str(time.time())
         self.tid = tid
 
     def gen_hashable_data(self) -> bytes:
-        data = [str(self.tid), str(self.payee), str(self.beneficiary), str(self.amount), str(self.time)]
+        data = [str(self.tid), str(self.payee), str(self.beneficiary), str(self.amount), self.time]
         return ' '.join(data).encode() 
 
     def gen_json(self) -> dict:
         return {
                 'tid': self.tid,
-                'signature': str(self.signature),
+                'signature': self.signature,
                 'payee': str(self.payee),
                 'beneficiary': str(self.beneficiary),
                 'amount': self.amount,
@@ -52,7 +54,7 @@ class transaction:
         if self.payee == "13".encode():
             assert self.amount == MINE_REWARD, "False mining reward" 
         else:
-            assert self.signature != None, "No signature on transaction"
+            assert self.signature != -1, "No signature on transaction"
             assert enc.verify_sign(enc.gen_hash(self.gen_hashable_data()),
                     RSA.importKey(self.payee), self.signature), "Public Key does not match signature"
 
