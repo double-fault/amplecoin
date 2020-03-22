@@ -27,8 +27,11 @@ node = network()
 node.setup()
 
 node.sync()
+sk, pk = enc.gen_keys()
 
 try:
+    while bc.genesis_block == None: node.run(bc)
+    bc.mine(pk)
     while node.run(bc): pass
 except AssertionError as err:
     logging.error(err)

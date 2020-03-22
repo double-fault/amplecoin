@@ -46,10 +46,7 @@ class block:
 
     def validate(self):
         data = self.get_hashable_data() + str(self.nonce)
-        print(data.encode('utf-16'))
         hash = enc.gen_hash(data.encode('utf-16'))
-        print(hash)
-        print(self.hash)
         assert hash[1] == self.hash[1], "Invalid block hash"
         assert hash[1].startswith('0' * NUM_ZEROES), \
                 "Block has does not start with " + str(NUM_ZEROES)+ " zeroes"

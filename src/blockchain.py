@@ -38,7 +38,7 @@ class blockchain:
     # Finds chain with most Proof of Work
     def longest_chain(self, curr: int = 0) -> list:
         ret = []
-        for each in adj_list[curr]:
+        for each in self.adj_list[str(curr)]:
             assert self.blocks[each].depth > self.blocks[curr].depth, \
                     "and the rain will kill us all"
             tret = longest_chain(each)
@@ -51,7 +51,7 @@ class blockchain:
         idx = self.longest_chain()[-1]
 
         b = block(self.transactions, self.blocks[idx].depth + 1, self.blocks[idx].hash,
-                self.blocks[idx].hash.tid + len(self.blocks[idx].transactions) +
+                self.blocks[idx].tid + len(self.blocks[idx].transactions) +
                 len(self.transactions))
         self.transactions = []
         b.mine(beneficiary)
@@ -61,18 +61,18 @@ class blockchain:
         self.block_broadcast.append(b)
 
     def add_block(self, b: block):
-        idx = find_block(b.prev_hash)
+        idx = self.find_block(b.prev_hash)
         b.validate()
         assert idx != -1, "Block parent not found"
 
         self.blocks.append(b)
         num = len(self.blocks) - 1
-        adj_list[idx].append(num)
-        adj_list[num] = []
+        self.adj_list[str(idx)].append(num)
+        self.adj_list[str(num)] = []
 
     def validate(self, curr: int = 0):
         self.blocks[curr].validate()
-        for each in adj_list[curr]:
+        for each in self.adj_list[str(curr)]:
             assert self.blocks[each].prev_hash == self.blocks[curr].hash, \
                     "Invalid previous hash"
             self.validate(each)
@@ -125,9 +125,12 @@ class blockchain:
         assert rewrite or self.genesis_block == None, "Blockchain not empty" 
 
         self.adj_list = json['adj_list']
+        print(json['adj_list'])
         self.transactions = []
         self.blocks = [self.load_block(x) for x in json['blocks']]
         self.genesis_block = self.blocks[0]
+        print('in')
+        print(self.genesis_block)
         
         self.validate()
 
