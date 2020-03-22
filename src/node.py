@@ -10,6 +10,8 @@ from blockchain import blockchain
 from network import network
 from block import block
 import encryption as enc
+import logging
+logging.basicConfig(format='%(asctime)-15s %(clientip)s %(user)-8s %(message)s')
 
 bc = blockchain()
 

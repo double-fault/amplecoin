@@ -13,7 +13,8 @@ import encryption as enc
 import time
 
 import signal
-
+import logging
+logging.basicConfig(format='%(asctime)-15s %(clientip)s %(user)-8s %(message)s')
 
 alice_sk, alice_pk = enc.gen_keys()
 bob_sk, bob_pk = enc.gen_keys()

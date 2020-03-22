@@ -9,6 +9,7 @@
 import socket
 import string
 import random
+import logging
 
 NETWORK_PORT=3993
 
