@@ -12,9 +12,16 @@ from block import block
 import encryption as enc
 import time
 
+def signal_handler(sig, frame):
+    global node
+    node.stop = True
+
 import signal
+signal.signal(signal.SIGINT, signal_handler)
+
 import logging
-logging.basicConfig(format='%(asctime)-15s %(clientip)s %(user)-8s %(message)s')
+logging.basicConfig(format='%(asctime)-15s %(message)s')
+logging.getLogger().setLevel(logging.INFO)
 
 alice_sk, alice_pk = enc.gen_keys()
 bob_sk, bob_pk = enc.gen_keys()
@@ -31,7 +38,4 @@ try:
 except AssertionError as err:
     print(err)
 
-def signal_handler(sig, frame):
-    global node
-    node.stop = True
 

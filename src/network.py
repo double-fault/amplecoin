@@ -23,10 +23,10 @@ class network:
         self.stop = False
         self.ident = self.gen_ident()
 
-    # returns identifier of length 2048
+    # returns identifier of length 64
     def gen_ident(self) -> str:
         ret = ""
-        for i in range(2048):
+        for i in range(64):
             ret += random.choice(string.ascii_letters)
         return ret
 
@@ -40,7 +40,6 @@ class network:
         self.socket.settimeout(4)
 
     def broadcast(self, packet):
-        logging.info("Broadcasting new block")
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sock.sendto(packet.encode(), ('255.255.255.255', NETWORK_PORT))
@@ -57,6 +56,7 @@ class network:
         while len(blockchain.block_broadcast):
             msg = self.ident + PACKET_NEW_BLOCK + blockchain.block_broadcast[-1].jsondump()
             self.broadcast(msg)
+            logging.info("Broadcasting new block")
             del blockchain.block_broadcast[-1]
 
         try:
@@ -65,7 +65,7 @@ class network:
         except:
             return True
         if data.startswith(self.ident): return True
-        data = data[2048:]
+        data = data[64:]
 
         if data.startswith(PACKET_CHAIN_SYNC):
             logging.info("Sending blockchain to %d".format(addr[0]))
@@ -82,5 +82,6 @@ class network:
             data = data[len(PACKET_NEW_BLOCK):]
             b = blockchain.load_block(json.loads(data))
             blockchain.add_block(b)
+        return True
 
 
