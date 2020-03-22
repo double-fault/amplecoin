@@ -36,6 +36,6 @@ node.setup()
 try:
     while node.run(bc): pass
 except AssertionError as err:
-    print(err)
+    logging.error(err)
 
 

@@ -9,6 +9,7 @@
 import socket
 import string
 import random
+import json
 import logging
 
 NETWORK_PORT=3993
@@ -72,7 +73,7 @@ class network:
             self.send(addr[0], self.ident + PACKET_CHAIN_SYNC_CONF + blockchain.jsondump())
         elif data.startswith(PACKET_CHAIN_SYNC_CONF):
             logging.info("Blockchain received for sync")
-            assert not len(blockchain.blocks), \
+            assert blockchain.genesis_block == None, \
                     "Blockchain not empty; sync failure"
             data = data[len(PACKET_CHAIN_SYNC_CONF):]
             blockchain.load_blocks(json.loads(data))

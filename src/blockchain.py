@@ -81,7 +81,7 @@ class blockchain:
         assert self.genesis_block != None, "No genesis block"
         return {
                 'adj_list': self.adj_list,
-                'blocks': [x.jsondump() for x in self.blocks]
+                'blocks': [x.gen_json() for x in self.blocks]
         }
 
     def jsondump(self) -> str:
@@ -114,11 +114,11 @@ class blockchain:
 
     def load_block(self, json: dict) -> block:
         transactions = [transaction(et['tid'], et['payee'].encode(), et['beneficiary'].encode(),
-             et['amount'], et['signature'], et['time']) for et in each['transactions']]
-        b = block(transactions, each['depth'], 
-                (each['prev_hash'][0].encode(), each['prev_hash'][1]), each['tid'], 
-                each['nonce'],
-                (each['hash'][0].encode(), each['hash'][1]), each['time'])
+             et['amount'], et['signature'], et['time']) for et in json['transactions']]
+        b = block(transactions, json['depth'], 
+                (json['prev_hash'][0].encode(), json['prev_hash'][1]), json['tid'], 
+                json['nonce'],
+                (json['hash'][0].encode(), json['hash'][1]), json['time'])
         return b
 
     def load_blocks(self, json: dict, rewrite: bool = False):
