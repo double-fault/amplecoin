@@ -26,7 +26,7 @@ logging.getLogger().setLevel(logging.INFO)
 alice_sk, alice_pk = enc.gen_keys()
 bob_sk, bob_pk = enc.gen_keys()
 
-genesis_block = block([], 0, ("".encode(), ""))
+genesis_block = block([], 0, ("".encode('utf-16'), ""))
 genesis_block.mine(alice_pk)
 bc = blockchain(genesis_block)
 
