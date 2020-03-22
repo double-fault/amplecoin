@@ -21,7 +21,7 @@ PACKET_NEW_BLOCK = PACKET_PREFIX + "_NEW_BLOCK"
 class network:
     def __init__(self):
         self.stop = False
-        self.ident = self.gen_ident
+        self.ident = self.gen_ident()
 
     # returns identifier of length 2048
     def gen_ident(self) -> str:
