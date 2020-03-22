@@ -46,7 +46,10 @@ class block:
 
     def validate(self):
         data = self.get_hashable_data() + str(self.nonce)
+        print(data.encode())
         hash = enc.gen_hash(data.encode())
+        print(hash)
+        print(self.hash)
         assert hash == self.hash, "Invalid block hash"
         assert hash[1].startswith('0' * NUM_ZEROES), \
                 "Block has does not start with " + str(NUM_ZEROES)+ " zeroes"
@@ -63,9 +66,9 @@ class block:
         return {
                 'transactions': ratm,
                 'depth': self.depth,
-                'prev_hash': [str(self.prev_hash[0]), self.prev_hash[1]],
+                'prev_hash': [self.prev_hash[0].decode('utf-8'), self.prev_hash[1]],
                 'nonce': self.nonce,
-                'hash': [str(self.hash[0]), self.hash[1]],
+                'hash': [self.hash[0].decode('utf-8'), self.hash[1]],
                 'tid': self.tid,
                 'time': self.time
         }

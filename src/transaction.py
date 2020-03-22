@@ -26,15 +26,16 @@ class transaction:
         self.tid = tid
 
     def gen_hashable_data(self) -> bytes:
-        data = [str(self.tid), str(self.payee), str(self.beneficiary), str(self.amount), self.time]
+        data = [str(self.tid), self.payee.decode('utf-8'), 
+                self.beneficiary.decode('utf-8'), str(self.amount), self.time]
         return ' '.join(data).encode() 
 
     def gen_json(self) -> dict:
         return {
                 'tid': self.tid,
                 'signature': self.signature,
-                'payee': str(self.payee),
-                'beneficiary': str(self.beneficiary),
+                'payee': self.payee.decode('utf-8'),
+                'beneficiary': self.beneficiary.decode('utf-8'),
                 'amount': self.amount,
                 'time': self.time
         }
