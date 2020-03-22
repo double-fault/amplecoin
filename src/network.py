@@ -15,7 +15,7 @@ NETWORK_PORT=3993
 
 PACKET_PREFIX = "AMPLECOIN"
 PACKET_CHAIN_SYNC = PACKET_PREFIX + "_CHAIN_SYNC"
-PACKET_CHAIN_SYNC_CONF = PACKET_CHAIN_SYNC + "_CONF"
+PACKET_CHAIN_SYNC_CONF = PACKET_PREFIX + "_CHAIN_CONF"
 PACKET_NEW_BLOCK = PACKET_PREFIX + "_NEW_BLOCK"
 
 class network:
@@ -62,7 +62,6 @@ class network:
         try:
             d, addr = self.socket.recvfrom(4096)
             data = d.decode('utf-8')
-            print(data)
         except:
             return True
         if data.startswith(self.ident): return True
