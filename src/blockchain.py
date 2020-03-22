@@ -80,7 +80,7 @@ class blockchain:
     def gen_json(self) -> dict:
         assert self.genesis_block != None, "No genesis block"
         return {
-                'adj_list': adj_list,
+                'adj_list': self.adj_list,
                 'blocks': [x.jsondump() for x in self.blocks]
         }
 

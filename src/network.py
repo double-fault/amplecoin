@@ -31,12 +31,12 @@ class network:
         return ret
 
     def send(self, ip: str, msg: str):
-        ss = socket.socket(SOCKET.AF_INET, socket.SOCK_DGRAM)
+        ss = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         ss.sendto(msg.encode(), (ip, NETWORK_PORT))
 
     def setup(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.bind(("", NETWORK_PORT))
+        self.socket.bind(('', NETWORK_PORT))
         self.socket.settimeout(4)
 
     def broadcast(self, packet):
@@ -61,14 +61,15 @@ class network:
 
         try:
             d, addr = self.socket.recvfrom(4096)
-            data = str(d)
+            data = d.decode('utf-8')
+            print(data)
         except:
             return True
         if data.startswith(self.ident): return True
         data = data[64:]
 
         if data.startswith(PACKET_CHAIN_SYNC):
-            logging.info("Sending blockchain to %d".format(addr[0]))
+            logging.info("Sending blockchain to {}".format(addr[0]))
             self.send(addr[0], self.ident + PACKET_CHAIN_SYNC_CONF + blockchain.jsondump())
         elif data.startswith(PACKET_CHAIN_SYNC_CONF):
             logging.info("Blockchain received for sync")
