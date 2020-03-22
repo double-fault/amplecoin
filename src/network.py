@@ -7,6 +7,7 @@
 #
 
 import socket
+import string
 import random
 
 NETWORK_PORT=3993
@@ -19,7 +20,14 @@ PACKET_NEW_BLOCK = PACKET_PREFIX + "_NEW_BLOCK"
 class network:
     def __init__(self):
         self.stop = False
-        self.ident = str(random.randint(0, 100000000)) # todo: constant length random gen 
+        self.ident = self.gen_ident
+
+    # returns identifier of length 2048
+    def gen_ident(self) -> str:
+        ret = ""
+        for i in range(2048):
+            ret += random.choice(string.ascii_letters)
+        return ret
 
     def send(self, ip: str, msg: str):
         ss = socket.socket(SOCKET.AF_INET, socket.SOCK_DGRAM)
@@ -30,24 +38,47 @@ class network:
         self.socket.bind(("", NETWORK_PORT))
         self.socket.settimeout(4)
 
+    def broadcast(self, packet):
+        logging.info("Broadcasting new block")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.sendto(packet, ('255.255.255.255', NETWORK_PORT))
+
+    def sync(self):
+        logging.info("Blockchain sync request broadcasted")
+        self.broadcast(self.ident + PACKET_CHAIN_SYNC)
+
     def run(self, blockchain) -> bool:
         if self.stop:
             self.socket.close()
             return False
+
+        while len(blockchain.block_broadcast):
+            msg = self.ident + PACKET_NEW_BLOCK + blockchain.block_broadcast[-1].jsondump()
+            self.broadcast(msg)
+            del blockchain.block_broadcast[-1]
 
         try:
             data, addr = self.socket.recvfrom(4096)
         except:
             return True
         if data.startswith(self.ident): return True
-        data = data[len(self.ident)]
+        data = data[2048:]
 
         if data.startswith(PACKET_CHAIN_SYNC):
+            logging.info("Sending blockchain to %d".format(addr[0]))
             self.send(addr[0], self.ident + PACKET_CHAIN_SYNC_CONF + blockchain.jsondump())
         elif data.startswith(PACKET_CHAIN_SYNC_CONF):
+            logging.info("Blockchain received for sync")
             assert not len(blockchain.blocks), \
                     "Blockchain not empty; sync failure"
-            data = data[len(PACKET_CHAIN_SYNC_CONF)]
+            data = data[len(PACKET_CHAIN_SYNC_CONF):]
             blockchain.load_blocks(json.loads(data))
         elif data.startswith(PACKET_NEW_BLOCK):
+            logging.info("Received new block")
+            assert blockchain.genesis_block != None, "Genesis block does not exist"
+            data = data[len(PACKET_NEW_BLOCK):]
+            b = blockchain.load_block(json.loads(data))
+            blockchain.add_block(b)
+
 

@@ -16,13 +16,13 @@ MINE_REWARD=10
 class transaction:
     # payee is 13 for mining reward
     def __init__(self, tid: int, payee: bytes, beneficiary: bytes, amount: float,
-            signature: int = -1, time: str = -1):
+            signature: int = -1, tme: str = "-1"):
         self.signature = signature
         self.payee = payee
         self.beneficiary = beneficiary
         self.amount = amount
-        self.time = time
-        if self.time == -1: self.time = str(time.time())
+        self.time = tme
+        if self.time == "-1": self.time = str(time.time())
         self.tid = tid
 
     def gen_hashable_data(self) -> bytes:

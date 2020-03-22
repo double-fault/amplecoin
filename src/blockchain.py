@@ -12,10 +12,9 @@ from transaction import transaction
 import json
 
 class blockchain:
+    # todo: makes adj_list work on hashes not indexes for uniformity between nodes
     def __init__(self, genesis_block: block = None,
             adj_list = {'0': []}, blocks = list(), transactions = list()):
-        genesis_block.validate()
-
         self.genesis_block = genesis_block        # Indexed 0 
         self.adj_list = adj_list
         self.blocks = [genesis_block]
@@ -58,12 +57,18 @@ class blockchain:
         b.mine(beneficiary)
         b.validate()
 
+        self.add_block(b)
+        self.block_broadcast.append(b)
+
+    def add_block(self, b: block):
+        idx = find_block(b.prev_hash)
+        b.validate()
+        assert idx != -1, "Block parent not found"
+
         self.blocks.append(b)
         num = len(self.blocks) - 1
         adj_list[idx].append(num)
         adj_list[num] = []
-
-        self.block_broadcast.append(b)
 
     def validate(self, curr: int = 0):
         self.blocks[curr].validate()
