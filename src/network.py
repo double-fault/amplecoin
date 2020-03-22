@@ -33,7 +33,7 @@ class network:
 
     def send(self, ip: str, msg: str):
         ss = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        ss.sendto(msg.encode(), (ip, NETWORK_PORT))
+        ss.sendto(msg.encode('utf-16'), (ip, NETWORK_PORT))
 
     def setup(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -43,7 +43,7 @@ class network:
     def broadcast(self, packet):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.sendto(packet.encode(), ('255.255.255.255', NETWORK_PORT))
+        sock.sendto(packet.encode('utf-16'), ('255.255.255.255', NETWORK_PORT))
 
     def sync(self):
         logging.info("Blockchain sync request broadcasted")
@@ -62,7 +62,7 @@ class network:
 
         try:
             d, addr = self.socket.recvfrom(4096)
-            data = d.decode('utf-8')
+            data = d.decode('utf-16')
         except:
             return True
         if data.startswith(self.ident): return True

@@ -14,7 +14,7 @@ import encryption as enc
 import json
 
 NUM_ZEROES = 4
-DEF_HASH = ("abcd".encode(), "abcd")
+DEF_HASH = ("abcd".encode('utf-16'), "abcd")
 
 class block:
     def __init__(self, transactions, depth: int, prev_hash: (bytes, str), 
@@ -36,18 +36,18 @@ class block:
     def mine(self, beneficiary: bytes) -> None:
         self.time = str(time.time())
         self.transactions.append(transaction(self.tid + len(self.transactions), 
-            "13".encode(), beneficiary, MINE_REWARD))
+            "13".encode('utf-16'), beneficiary, MINE_REWARD))
         data = self.get_hashable_data() 
 
         while not self.hash[1].startswith('0' * NUM_ZEROES):
             self.nonce = rand.randint(1, 163527364)
             tdata = data + str(self.nonce)
-            self.hash = enc.gen_hash(tdata.encode())
+            self.hash = enc.gen_hash(tdata.encode('utf-16'))
 
     def validate(self):
         data = self.get_hashable_data() + str(self.nonce)
-        print(data.encode())
-        hash = enc.gen_hash(data.encode())
+        print(data.encode('utf-16'))
+        hash = enc.gen_hash(data.encode('utf-16'))
         print(hash)
         print(self.hash)
         assert hash == self.hash, "Invalid block hash"
@@ -56,19 +56,20 @@ class block:
 
         reward = 0
         for each in self.transactions:
-            if each.payee == "13".encode():
+            if each.payee == "13".encode('utf-16'):
                 assert not reward, "Too many reward transactions in block"
                 reward = 1
         assert reward, "No reward transaction in block"
 
     def gen_json(self) -> dict:
         ratm = [x.gen_json() for x in self.transactions]
+        print(self.hash)
         return {
                 'transactions': ratm,
                 'depth': self.depth,
-                'prev_hash': [self.prev_hash[0].decode('utf-8'), self.prev_hash[1]],
+                'prev_hash': [self.prev_hash[0].decode('utf-16'), self.prev_hash[1]],
                 'nonce': self.nonce,
-                'hash': [self.hash[0].decode('utf-8'), self.hash[1]],
+                'hash': [self.hash[0].decode('utf-16'), self.hash[1]],
                 'tid': self.tid,
                 'time': self.time
         }

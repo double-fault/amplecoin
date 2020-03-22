@@ -113,12 +113,12 @@ class blockchain:
         self.transactions.append(t)
 
     def load_block(self, json: dict) -> block:
-        transactions = [transaction(et['tid'], et['payee'].encode(), et['beneficiary'].encode(),
+        transactions = [transaction(et['tid'], et['payee'].encode('utf-16'), et['beneficiary'].encode('utf-16'),
              et['amount'], et['signature'], et['time']) for et in json['transactions']]
         b = block(transactions, json['depth'], 
-                (json['prev_hash'][0].encode(), json['prev_hash'][1]), json['tid'], 
+                (json['prev_hash'][0].encode('utf-16'), json['prev_hash'][1]), json['tid'], 
                 json['nonce'],
-                (json['hash'][0].encode(), json['hash'][1]), json['time'])
+                (json['hash'][0].encode('utf-16'), json['hash'][1]), json['time'])
         return b
 
     def load_blocks(self, json: dict, rewrite: bool = False):
