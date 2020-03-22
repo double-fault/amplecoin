@@ -32,7 +32,7 @@ class network:
 
     def send(self, ip: str, msg: str):
         ss = socket.socket(SOCKET.AF_INET, socket.SOCK_DGRAM)
-        ss.sendto(msg, (ip, NETWORK_PORT))
+        ss.sendto(msg.encode(), (ip, NETWORK_PORT))
 
     def setup(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -43,7 +43,7 @@ class network:
         logging.info("Broadcasting new block")
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.sendto(packet, ('255.255.255.255', NETWORK_PORT))
+        sock.sendto(packet.encode(), ('255.255.255.255', NETWORK_PORT))
 
     def sync(self):
         logging.info("Blockchain sync request broadcasted")
@@ -60,7 +60,8 @@ class network:
             del blockchain.block_broadcast[-1]
 
         try:
-            data, addr = self.socket.recvfrom(4096)
+            d, addr = self.socket.recvfrom(4096)
+            data = str(d)
         except:
             return True
         if data.startswith(self.ident): return True
